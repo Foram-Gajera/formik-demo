@@ -1,7 +1,16 @@
 // and use of Formik Component
 
 import React from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import {
+  Formik,
+  Form,
+  Field,
+  ErrorMessage,
+  FieldArray,
+  FastField,
+} from "formik";
+//FastField is optimized version of Field component which is works like shouldComponentUpdate LifeCycle
+//the props of FastField component renders when only it updates
 import * as Yup from "yup";
 import TextError from "./TextError";
 
@@ -21,6 +30,7 @@ const initialValues = {
   },
   //array
   phoneNumbers: ["", ""],
+  phNumbers: [""],
 };
 
 const onSubmit = (values) => {
@@ -33,6 +43,15 @@ const validationSchema = Yup.object({
   channel: Yup.string().required("Required"),
   address: Yup.string().required("Required"),
 });
+
+//For Field Level Validation
+const validateComments = (value) => {
+  let error;
+  if (!value) {
+    error = "Required";
+  }
+  return error;
+};
 
 const YouTubeForm = () => {
   //   const formik = useFormik({
@@ -95,14 +114,15 @@ const YouTubeForm = () => {
             as="textarea"
             id="comments"
             name="comments"
+            validate={validateComments}
             // {...formik.getFieldProps("comments")}
           />
-          <ErrorMessage name="comments" />
+          <ErrorMessage name="comments" component={TextError} />
         </div>
 
         <div className="form-control">
           <label htmlFor="address">Address</label>
-          <Field name="address">
+          <FastField name="address">
             {(props) => {
               const { field, form, meta } = props;
               console.log(props);
@@ -115,7 +135,7 @@ const YouTubeForm = () => {
                 </div>
               );
             }}
-          </Field>
+          </FastField>
           {/* <ErrorMessage name="address" /> */}
         </div>
 
@@ -137,6 +157,40 @@ const YouTubeForm = () => {
         <div className="form-control">
           <label htmlFor="secondaryPh">Secondary Phone number</label>
           <Field type="text" id="secondaryPh" name="phoneNumbers[1]" />
+        </div>
+
+        <div className="form-control">
+          <label>List of Phone numbers</label>
+          <FieldArray name="phNumbers">
+            {(fieldArrayProps) => {
+              console.log(fieldArrayProps);
+              const { push, remove, form } = fieldArrayProps;
+              const { values } = form;
+              const { phNumbers } = values;
+              console.log("length: " + phNumbers.length);
+              const check = phNumbers.length !== 1 ? false : true;
+              console.log("phNumbers Field -> form errors: ", form.errors);
+              return (
+                <div>
+                  {phNumbers.map((phNumber, index) => (
+                    <div key={index}>
+                      <Field name={`phNumbers[${index}]`} />
+                      <button
+                        type="button"
+                        disabled={check}
+                        onClick={() => remove(index)}
+                      >
+                        -
+                      </button>
+                      <button type="button" onClick={() => push("")}>
+                        +
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              );
+            }}
+          </FieldArray>
         </div>
 
         <button type="submit">Submit</button>
