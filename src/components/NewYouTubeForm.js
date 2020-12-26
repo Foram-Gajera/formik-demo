@@ -1,5 +1,5 @@
 // manually triggering validations
-import React from "react";
+import React, { useState } from "react";
 import {
   Formik,
   Form,
@@ -17,7 +17,7 @@ import TextError from "./TextError";
 
 const initialValues = {
   //this key names is same as name property of input fields
-  name: "",
+  name: "forii",
   email: "",
   channel: "",
   comments: "",
@@ -32,8 +32,27 @@ const initialValues = {
   phNumbers: [""],
 };
 
-const onSubmit = (values) => {
+const savedValues = {
+  name: "foram",
+  email: "f@gmail.com",
+  channel: "formik",
+  comments: "load saved data",
+  address: "junagadh",
+  social: {
+    facebook: "",
+    twitter: "",
+  },
+  phoneNumbers: ["", ""],
+  phNumbers: [""],
+};
+
+const onSubmit = (values, onSubmitProps) => {
   console.log(values);
+  console.log(onSubmit);
+  //this setSubmitting is caalled after successful api request
+  onSubmitProps.setSubmitting(false);
+  //after submit data to reset the form
+  onSubmitProps.resetForm();
 };
 
 const validationSchema = Yup.object({
@@ -53,6 +72,9 @@ const validateComments = (value) => {
 };
 
 const NewYouTubeForm = () => {
+  //useState
+  const [formValues, setFormValues] = useState(null);
+
   //   const formik = useFormik({
   //     initialValues,
   //     onSubmit,
@@ -64,9 +86,13 @@ const NewYouTubeForm = () => {
 
   return (
     <Formik
-      initialValues={initialValues}
+      //don't write initialValue || formValues
+      //because it checks from first if formValues are not null then only it takes initialValues
+      initialValues={formValues || initialValues}
       onSubmit={onSubmit}
       validationSchema={validationSchema}
+      //it decides whether form canc hage the initial value or not after the form initializa once
+      enableReinitialize
       //   validateOnMount -> use for small validation not true with complex validations
     >
       {(formik) => {
@@ -219,7 +245,18 @@ const NewYouTubeForm = () => {
               Touch all field
             </button>
             <br />
-            <button type="submit" disabled={!(formik.dirty && formik.isValid)}>
+            <button type="button" onClick={() => setFormValues(savedValues)}>
+              Load Saved Data
+            </button>
+
+            {/* it reset the forms with initial values */}
+            <button type="reset">Reset</button>
+            <br />
+            <button
+              type="submit"
+              disabled={!formik.isValid || formik.isSubmitting}
+            >
+              {/* disabled={!(formik.dirty && formik.isValid)} */}
               Submit
             </button>
           </Form>

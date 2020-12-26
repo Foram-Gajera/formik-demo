@@ -1,10 +1,12 @@
 import "./App.css";
-import NewYouTubeForm from "./components/NewYouTubeForm";
+// import NewYouTubeForm from "./components/NewYouTubeForm";
+import MyApp from "./formikControls/myApp";
 
 function App() {
   return (
     <div className="App">
-      <NewYouTubeForm />
+      <MyApp />
+      {/* <NewYouTubeForm /> */}
     </div>
   );
 }
